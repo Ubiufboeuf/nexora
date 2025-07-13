@@ -6,9 +6,34 @@
     url('/Inter.woff2') format('woff2');
 }
 
+@font-face {
+  font-family: 'mazzard soft';
+  src: local('mazzard soft'),
+    url('/mazzard-soft-h-bold.woff2') format('woff2');
+}
+
 @theme {
+  --font-mazzard-soft: 'mazzard soft';
+  
   --color-bg: #1F2937;
-  --color-primary: #F4F4F5;
+  --color-base: #111827;
+  --color-primary: #F4F4F5DD;
+  --color-border: #374151;
+
+  --container-video-card: 355.5px;
+  --spacing-video-card: var(--container-video-card);
+
+  --container-videos-container-4: 1470px;
+  --container-videos-container-3: 1114.5px;
+  --container-videos-container-2: 759px;
+  --container-videos-container: 403.5px;
+
+  --breakpoint-videos-container-4: 1470px;
+  --breakpoint-videos-container-3: 1114.5px;
+  --breakpoint-videos-container-2: 759px;
+  --breakpoint-videos-container: 403.5px;
+
+  --ease-base: ease;
 }
 
 :root {
@@ -21,4 +46,20 @@ body {
   height: 100%;
   width: 100%;
   margin: 0;
+}
+
+html:has(#checkboxAsideMenu:not(:checked)) {
+  #asideMenu {
+    left: -256px;
+  }
+}
+
+html:has(#checkboxAsideMenu:checked) {
+  #asideMenu {
+    left: 0px;
+  }
+
+  #main {  
+    @apply lg:pl-64
+  }
 }
