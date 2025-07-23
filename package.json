@@ -6,7 +6,11 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+		"cf-typegen": "wrangler types",
+		"deploy": "pnpm run build && wrangler deploy",
+		"postinstall": "npm run cf-typegen",
+		"preview": "pnpm run build && vite preview",
+		"typecheck": "npm run cf-typegen && react-router typegen && tsc -b"
   },
   "dependencies": {
     "@react-router/node": "^7.5.3",
@@ -38,9 +42,10 @@
     "typescript-eslint": "^8.35.1",
     "vite": "^6.3.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "wrangler": "4.24.3"
+    "wrangler": "4.24.3",
+    "@cloudflare/vite-plugin": "^1.0.12"
   },
   "imports": {
-    "#c/*": "./components/*"
+    "#/*": "./*"
   }
 }
