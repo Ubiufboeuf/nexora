@@ -68,3 +68,17 @@ export interface Thumbnail {
 }
 
 export type Filters = 'all' | 'video' | 'music' | 'liked'
+
+export type ServerResponse = {
+  success: boolean
+  status: number
+  msg?: string
+  cause?: string
+  ids?: string
+  cursor: string
+  // [key: string]: VideoFromServer | VideoFromServer[]
+}
+
+export type ServerResponseToGetVideos = ServerResponse & {
+  videos: VideoFromServer[]
+}
