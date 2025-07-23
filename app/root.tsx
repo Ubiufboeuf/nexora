@@ -35,16 +35,20 @@ export async function loader ({ request }: { request: Request }) {
   const url = new URL(request.url)
   let cursor: Cursor | null = null
   let videos: Video[] = []
-  try {
-    const { newVideos, nextCursor } = await getVideos(cursor, AMOUNT_TO_REQUEST)
-    videos = newVideos
-    cursor = nextCursor
-  } catch (err) {
-    handleError(err)
-    return { url }
+  let error = false
+  if (url.pathname === '/') {
+    try {
+      const res = await getVideos(cursor, AMOUNT_TO_REQUEST)
+      videos = res.newVideos
+      cursor = res.nextCursor
+    } catch (err) {
+      error = true
+      handleError(err)
+      return { url }
+    }
   }
 
-  return { url, videos, cursor }
+  return { url, videos, cursor, error }
 }
 
 export function HydrateFallback ({ loaderData: { url } }: Route.ComponentProps) {
@@ -77,10 +81,6 @@ export function HydrateFallback ({ loaderData: { url } }: Route.ComponentProps) 
 }
 
 export function Layout ({ children }: { children: ReactNode }) {
-  const loaderData = useLoaderData<{ url: URL, videos: Video[] | null, cursor: Cursor | null }>()
-  const videos = loaderData.videos
-  const cursorFromLoader = loaderData.cursor
-
   const mainRef = useRef<HTMLDivElement>(null)
   const observerRef = useRef<IntersectionObserver>(null)
   const observableItem = useObservableItemStore((state) => state.item)
@@ -88,7 +88,13 @@ export function Layout ({ children }: { children: ReactNode }) {
   const addVideos = useVideosStore((state) => state.addVideos)
   const setVideos = useVideosStore((state) => state.setVideos)
   const addFilteredVideos = useVideosStore((state) => state.addFilteredVideos)
+  const setErrorLoadingVideos = useVideosStore((state) => state.setErrorLoadingVideos)
   const [scrolled, setScrolled] = useState(false)
+
+  const loaderData = useLoaderData<{ url: URL, videos: Video[] | null, cursor: Cursor | null, error: boolean }>()
+  const videos = loaderData.videos
+  const cursorFromLoader = loaderData.cursor
+  const error = loaderData.error
   
   function handleHTMLElementLoad () {
     if (!observableItem) return
@@ -116,7 +122,17 @@ export function Layout ({ children }: { children: ReactNode }) {
   async function loadMoreVideos () {
     const currentState = useVideosStore.getState()
     const currentCursor = currentState.cursor
-    const { nextVideos, nextCursor } = await getMoreVideos(currentCursor, AMOUNT_TO_REQUEST)
+    let nextVideos: Video[] = []
+    let nextCursor: Cursor | null = null
+    try {
+      const { nextVideos: nv, nextCursor: nc } = await getMoreVideos(currentCursor, AMOUNT_TO_REQUEST)
+      nextVideos = nv
+      nextCursor = nc
+    } catch (err) {
+      handleError(err)
+      setErrorLoadingVideos(true)
+      return
+    }
     addVideos(nextVideos)
     addFilteredVideos(nextVideos)
     setCursor(nextCursor)
@@ -125,6 +141,7 @@ export function Layout ({ children }: { children: ReactNode }) {
   useEffect(() => {
     // detectDeviceType()
     // setIsAsideOpened(localStorage.getItem('asideMenuOpen') === 'true')
+    setErrorLoadingVideos(error)
     const cursor = new Cursor(cursorFromLoader?.category, cursorFromLoader?.last_id)
     // console.log('effect[]', cursor)
     setCursor(cursor)
@@ -146,8 +163,8 @@ export function Layout ({ children }: { children: ReactNode }) {
     if (!main) return
 
     if (scrolled && main.scrollTop === main.scrollHeight - main.clientHeight) {
-      loadMoreVideos()
       setScrolled(false)
+      loadMoreVideos()
     }
   }, [scrolled, mainRef])
 
