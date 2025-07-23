@@ -69,7 +69,7 @@ export default function Home () {
           <div
             ref={observableItemRef}
             id='observableItem'
-            className='pointer-events-none bg-transparent h-20 max-h-full w-full absolute bottom-150 left-0'
+            className='pointer-events-none bg-transparent h-20 max-h-full w-full absolute bottom-screen left-0'
           />
         </section>
       </div>
