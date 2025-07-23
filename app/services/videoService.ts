@@ -12,7 +12,7 @@ export async function getVideos (cursor: Cursor | null, limit: number): Promise<
       throw new Error('Error consiguiendo los videos')
     })
     .then((data) => {
-      console.log({ msg: data.msg })
+      // console.log({ msg: data.msg })
       if (!data.success) throw new Error(data.msg)
       const receivedVideos: Video[] = []
       data.videos.forEach((v: VideoFromServer) => {
@@ -23,7 +23,7 @@ export async function getVideos (cursor: Cursor | null, limit: number): Promise<
       })
       const cursor = Cursor.fromB64(data.cursor)
       // console.log('getVideos', receivedVideos.map((v) => v.id), cursor, receivedVideos.at(-1)?.id)
-      console.log({ receivedVideos, cursor })
+      // console.log({ receivedVideos, cursor })
       return { newVideos: receivedVideos, nextCursor: cursor }
     })
     .catch(() => {

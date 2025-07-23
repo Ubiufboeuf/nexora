@@ -21,7 +21,7 @@ const videosFallback = [
 export function VideosList ({ filteredVideos }: { filteredVideos: Video[] | null }) {
   const errorLoadingVideos = useVideosStore((state) => state.errorLoadingVideos)
   
-  console.log('error?', errorLoadingVideos)
+  // console.log('error?', errorLoadingVideos)
   if (filteredVideos && !errorLoadingVideos) {
     return filteredVideos.map((video) => <VideoCard key={video.id} video={video} />)
   } else if (errorLoadingVideos) {
